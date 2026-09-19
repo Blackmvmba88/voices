@@ -14,6 +14,8 @@ class AcousticFeatures:
     spectral_flatness: float
     harmonicity: float
     low_frequency_energy: float
+    formants_hz: tuple[float, ...] = ()
+    mfcc: tuple[float, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -30,6 +32,9 @@ class VoiceProfile:
     base_hue: float
     base_saturation: float
     base_lightness: float
+    formant_1_hz: float | None = None
+    formant_2_hz: float | None = None
+    mfcc_signature: tuple[float, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
