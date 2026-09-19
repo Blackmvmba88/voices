@@ -2,7 +2,7 @@
 
 ## Implemented in v0.1
 
-- Pure NumPy frame analysis: F0, RMS, spectral centroid, spectral flatness, harmonicity proxy and low-frequency energy.
+- Pure NumPy frame analysis: F0, RMS, spectral centroid, spectral flatness, harmonicity proxy, low-frequency energy, LPC formants and 13-coefficient MFCC signatures.
 - Stable acoustic voice profile separated from instantaneous pitch.
 - Acoustic profile -> base color family.
 - Pitch contour -> bounded hue/lightness modulation inside that family.
@@ -26,14 +26,14 @@ VOICES does not infer sex, gender, identity or emotion to choose a color. The co
 
 ## Validation
 
-Local deterministic core validation: 7 tests passed.
+Local deterministic core validation: 9 tests passed.
 
 The live server and faster-whisper adapter use optional dependencies, so CI validates the deterministic acoustic core independently of model downloads and microphone hardware.
 
 ## Next engineering slices
 
 1. Replace energy VAD with an optional neural VAD adapter for noisy rooms.
-2. Add calibrated formant extraction (F1/F2/F3) and MFCC descriptors to the persistent profile.
+2. Calibrate the existing LPC formants against reference speech corpora.
 3. Add speaker diarization for multi-person sessions.
 4. Add syllable/phoneme-level alignment and continuous glyph gradients.
 5. Add session export containing audio hash, transcript, acoustic frames and rendered styles.
