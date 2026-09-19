@@ -208,3 +208,50 @@ La voz deja de ser solamente texto y se convierte en una firma visual dinámica.
 **Iyari Gomez**
 
 `VOICE → PROFILE → PITCH → COLOR → TEXTURE → TEXT`
+
+
+## Estado actual — MVP ejecutable
+
+El repositorio ya incluye un motor funcional, no solamente el concepto:
+
+- análisis acústico por frames con F0, RMS, centroide espectral, flatness, harmonicidad aproximada, energía grave, formantes LPC y firma MFCC;
+- perfil de voz relativamente estable separado de la entonación instantánea;
+- color base por perfil acústico y modulación limitada por pitch;
+- textura tipográfica mediante opacidad, peso, glow y roughness;
+- nota musical y cents por palabra;
+- alineación de timestamps de palabras con frames acústicos;
+- transcripción opcional con faster-whisper;
+- render HTML de transcript cromático;
+- modo en vivo por navegador: micrófono → PCM16 → WebSocket → VAD → Whisper → texto coloreado;
+- medidor en tiempo real de F0, nota y color;
+- pruebas automáticas y CI.
+
+### Instalar
+
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -e '.[all,dev]'
+
+### Procesar un WAV
+
+    voices transcribe voz.wav --language es --html salida.html
+
+### Modo en vivo
+
+    voices-server --language es --model small
+
+Luego abre:
+
+    http://127.0.0.1:8765
+
+Pulsa **Iniciar micrófono**. El navegador envía audio mono a 16 kHz al servidor. Mientras hablas, el medidor muestra la frecuencia fundamental y la familia cromática; al detectar el final de una frase, Whisper entrega palabras con timestamps y VOICES las vuelve texto acústicamente coloreado.
+
+### Separación de responsabilidades
+
+    perfil acústico estable -> familia de color
+    pitch / entonación       -> variación dentro de la familia
+    harmonicidad / aire     -> saturación, opacidad, glow y textura
+    energía / profundidad   -> luminosidad y peso
+    palabra + timestamp     -> alineación con el audio
+
+La paleta es una decisión visual explícita. VOICES no necesita inferir sexo, género, identidad ni emoción para elegir el color.
