@@ -214,7 +214,7 @@ La voz deja de ser solamente texto y se convierte en una firma visual dinámica.
 
 El repositorio ya incluye un motor funcional, no solamente el concepto:
 
-- análisis acústico por frames con F0, RMS, centroide espectral, flatness, harmonicidad aproximada y energía grave;
+- análisis acústico por frames con F0, RMS, centroide espectral, flatness, harmonicidad aproximada, energía grave, formantes LPC y firma MFCC;
 - perfil de voz relativamente estable separado de la entonación instantánea;
 - color base por perfil acústico y modulación limitada por pitch;
 - textura tipográfica mediante opacidad, peso, glow y roughness;
