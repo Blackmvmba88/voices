@@ -31,10 +31,17 @@ def build_voice_profile(features: list[AcousticFeatures]) -> VoiceProfile:
     if not source:
         raise ValueError("at least one acoustic frame is required")
 
-    f0s = np.asarray([f.f0_hz for f in voiced], dtype=float) if voiced else np.asarray([140.0])
+    f0s = (
+        np.asarray([f.f0_hz for f in voiced], dtype=float)
+        if voiced
+        else np.asarray([140.0])
+    )
     centroids = np.asarray([f.spectral_centroid_hz for f in source], dtype=float)
     harmonics = np.asarray([f.harmonicity for f in source], dtype=float)
     lows = np.asarray([f.low_frequency_energy for f in source], dtype=float)
+    f1s = [f.formants_hz[0] for f in source if len(f.formants_hz) >= 1]
+    f2s = [f.formants_hz[1] for f in source if len(f.formants_hz) >= 2]
+    mfccs = [f.mfcc for f in source if f.mfcc]
 
     median_f0 = float(np.median(f0s))
     low_f0 = float(np.percentile(f0s, 10))
@@ -46,9 +53,21 @@ def build_voice_profile(features: list[AcousticFeatures]) -> VoiceProfile:
     )
     brightness = _clip01(float(np.median(centroids)) / 3500.0)
     harmonicity = _clip01(float(np.median(harmonics)))
-    depth = _clip01(0.65 * float(np.median(lows)) + 0.35 * (1.0 - register))
-
-    character = _clip01(0.52 * register + 0.30 * brightness + 0.18 * (1.0 - depth))
+    depth = _clip01(
+        0.65 * float(np.median(lows))
+        + 0.35 * (1.0 - register)
+    )
+    formant_brightness = (
+        _clip01((float(np.median(f2s)) - 900.0) / 2200.0)
+        if f2s
+        else brightness
+    )
+    character = _clip01(
+        0.47 * register
+        + 0.25 * brightness
+        + 0.13 * formant_brightness
+        + 0.15 * (1.0 - depth)
+    )
     base_hue = _interp_palette(character)
     base_saturation = 48.0 + 42.0 * harmonicity
     base_lightness = 40.0 + 20.0 * (1.0 - depth) + 6.0 * brightness
@@ -63,4 +82,11 @@ def build_voice_profile(features: list[AcousticFeatures]) -> VoiceProfile:
         base_hue=base_hue,
         base_saturation=float(np.clip(base_saturation, 30.0, 95.0)),
         base_lightness=float(np.clip(base_lightness, 28.0, 72.0)),
+        formant_1_hz=float(np.median(f1s)) if f1s else None,
+        formant_2_hz=float(np.median(f2s)) if f2s else None,
+        mfcc_signature=(
+            tuple(np.mean(np.asarray(mfccs), axis=0).tolist())
+            if mfccs
+            else ()
+        ),
     )
