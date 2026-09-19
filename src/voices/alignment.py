@@ -55,6 +55,7 @@ def summarize_features_for_word(
         f0_weights = np.asarray([w for _, w in f0_pairs], dtype=float)
         f0 = float(np.sum(values * f0_weights) / np.sum(f0_weights))
 
+    strongest = max(candidates, key=lambda f: f.rms)
     first = candidates[0]
     return replace(
         first,
@@ -66,4 +67,6 @@ def summarize_features_for_word(
         spectral_flatness=avg("spectral_flatness"),
         harmonicity=avg("harmonicity"),
         low_frequency_energy=avg("low_frequency_energy"),
+        formants_hz=strongest.formants_hz,
+        mfcc=strongest.mfcc,
     )
